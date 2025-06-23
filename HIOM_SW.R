@@ -112,7 +112,7 @@ plot.histo= function(x,min,max,xlab='')
 
 ##############
 
-scenario=3  # set scenario
+scenario=2  # set scenario
 
 # scenario 1: removed from manuscript
 # scenario 2 : figure 4
@@ -224,26 +224,28 @@ for(sim_value in sim_values)
         }
         
         N=400
-        network=make_network(model='WS',N=N,clusters=10,p_within=.2,p_between=.001,rewiring=.02)
+        network=make_network(model='SBM',N=N,clusters=10,p_within=.2,p_between=.001,rewiring=.02)
         g=network[[1]];l=network[[2]];adj=network[[3]]
         
-        sd_noise_information=.0005
+        sd_noise_information=0.0005
         info_update=T
         persuasion=1
-        r_min=0
+        r_min=0.1
         
         s_O=.01
         maxwell_convention=F
         
-        attention_star=1
+        attention_star=4
         min_attention=-.5
-        delta_attention=0
-        decay_attention=delta_attention/(attention_star*(N^2))
+        delta_attention=0.1
+    
         deffuant_c=Inf
         
         # all slighty positive low attention
-        information = rnorm(N, 0, .3)
-        attention = runif(N, 1, 1)
+        split_information = sample(c(T,F),N,T,prob = c(0.5,0.5))
+        information = rnorm(N, 0.5, 0.1)
+        information[split_information] = rnorm(sum(split_information), -0.5, 0.1)
+        attention = runif(N, 0, 0.2)
         opinion=rnorm(N,0,.2)
         
       }
@@ -518,13 +520,18 @@ for(sim_value in sim_values)
           
           ### attention decay for all agents
           information=information+rnorm(N,0,sd_noise_information)
-          attention=attention-2*delta_attention*attention/N                                 # correction 2 times if interaction
+          attention=attention-2*delta_attention*attention/N                             # correction 2 times if interaction
           
+
+
+          #pull attention to 0                       
+          #attention[attention<0]=0
+
           # scenario 2 schrinking
-          if(scenario==2) if(iteration>(1/3)*Ni) {information=.999*information;
-                                          sd_noise_information=0}  # schrinking I in scenario 2
-          if(scenario==2) if(iteration>(2/3)*Ni) {attention=.999*attention;
-                                          delta_attention=0} # schrinking A in scenario 2
+          #if(scenario==2) if(iteration>(1/3)*Ni) {information=.999*information;
+          #                               sd_noise_information=0}  # schrinking I in scenario 2
+          #if(scenario==2) if(iteration>(2/3)*Ni) {attention=.999*attention;
+          #                                delta_attention=0} # schrinking A in scenario 2
           
           ###  behavior update
           opinion=stoch_cusp(N,opinion,attention+min_attention,information,s_O,maxwell_convention)
@@ -590,10 +597,10 @@ for(sim_value in sim_values)
           
           if(iteration %in% plot_iteration)
           {
-            min.o=-1.5;max.o=1.5;min.i=-1;max.i=1;min.a=0;max.a=2
+            min.o=-1.5;max.o=1.5;min.i=-1;max.i=1;min.a=0;max.a=12
             opin=sapply(-opinion, function(y) min(max(y,min.o),max.o))
             inform=sapply(-information, function(y) min(max(y,min.i),max.i))
-            atten=attention;atten[atten>2]=2
+            atten=attention;atten[atten>12]=12
             CD=27*information^2-4*(attention+min_attention)^3
             assortativity_g=assortativity(g,opinion)
             
@@ -603,10 +610,10 @@ for(sim_value in sim_values)
             if(scenario==2 )
             {
               h_d=hartigan_d(opinion)
-              if (iteration >= 1) title = "1: Initial state"
-              if (iteration >= (1/3)*Ni) title = "2: A = 1, I varies"
-              if (iteration >= (2/3)*Ni) title= "3: A = 1, I = 0"
-              if (iteration == Ni) title = "4: A = 0, I = 0"
+              if (iteration >= 1) title = "1"
+              if (iteration >= (1/3)*Ni) title = "2"
+              if (iteration >= (2/3)*Ni) title= "3"
+              if (iteration == Ni) title = "4"
               sub_H=paste('\nHartigan D = ',round(h_d[[1]],2),h_d[[2]],sep="",col="")
               sub_A=paste("\nAssortativity =",round(assortativity_g,2))
               sub=paste(sub_H,sub_A)
