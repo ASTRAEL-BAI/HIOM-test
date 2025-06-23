@@ -112,7 +112,7 @@ plot.histo= function(x,min,max,xlab='')
 
 ##############
 
-scenario=4  # set scenario
+scenario=3  # set scenario
 
 # scenario 1: removed from manuscript
 # scenario 2 : figure 4
@@ -350,7 +350,7 @@ for(sim_value in sim_values)
         activism_on_at_iteration=300    
         
         plot_iteration=c(1,Ni)
-        plot_iteration=c(1,Ni)=NA
+        #plot_iteration=c(1,Ni)=NA                                                                                        #Debugged
       }
       
       if(scenario==4) # Meat eating vegies
@@ -518,13 +518,13 @@ for(sim_value in sim_values)
           
           ### attention decay for all agents
           information=information+rnorm(N,0,sd_noise_information)
-          attention=attention-2*delta_attention*attention/N   # correction 2 times if interaction
+          attention=attention-2*delta_attention*attention/N                                 # correction 2 times if interaction
           
           # scenario 2 schrinking
           if(scenario==2) if(iteration>(1/3)*Ni) {information=.999*information;
-                                          sd_noise_information=0}  # schrinking I in scenario 1
+                                          sd_noise_information=0}  # schrinking I in scenario 2
           if(scenario==2) if(iteration>(2/3)*Ni) {attention=.999*attention;
-                                          delta_attention=0} # schrinking A in scenario 1
+                                          delta_attention=0} # schrinking A in scenario 2
           
           ###  behavior update
           opinion=stoch_cusp(N,opinion,attention+min_attention,information,s_O,maxwell_convention)
@@ -684,12 +684,12 @@ for(sim_value in sim_values)
       ####################
       
       # cusp fig plot in scenario 3
-      if(scenario==3 & pdfplot) 
-      {cuspfig <- readPNG('figures/figure7.png')
-      plot(c(0,1),c(0,1), type='n', main="", xlab="", ylab="",axes=F)
-      par(mar=c(0,0,0,0))
-      rasterImage(cuspfig, .05,-.05, .9,1.05)
-      }
+      #if(scenario==3 & pdfplot) 
+      #{cuspfig <- readPNG('figures/figure7.png')                                                          #No Need
+      #plot(c(0,1),c(0,1), type='n', main="", xlab="", ylab="",axes=F)
+      #par(mar=c(0,0,0,0))
+      #rasterImage(cuspfig, .05,-.05, .9,1.05)
+      #}
       
       if(pdfplot) dev.off()
       
@@ -707,8 +707,8 @@ for(sim_value in sim_values)
 
 if(scenario==31)
 {
-#  save(datasim,file='figures/datasim_sc31')
-  load('figures/datasim_sc31_org')
+  save(datasim,file='figures/datasim_sc31')
+  #load('figures/datasim_sc31_org')
   sim_var=c('d_A');sim_var2=c('r_min'); sim_var3=c('network')
   mean_sim=as.matrix(aggregate(datasim[,4:7],list(datasim[,1],datasim[,2],datasim[,3]),mean,na.rm=T))
   colnames(mean_sim)=c(sim_var,sim_var2,sim_var3,c('p(O>0)','SD(O)','Hartigan D','Assortativity'))
@@ -742,8 +742,8 @@ if(scenario==31)
 
 if(scenario==41)
 {
-  #save(datasim,file='figures/datasim_sc41')
-  load('figures/datasim_sc41_org')
+  save(datasim,file='figures/datasim_sc41')
+  #load('figures/datasim_sc41_org')
   sim_var=c('p(pertubation)');sim_var2=c('t_d');sim_var3=c('network')
   mean_sim=as.matrix(aggregate(datasim[,4:7],list(datasim[,1],datasim[,2],datasim[,3]),mean,na.rm=T))
   colnames(mean_sim)=c('p_perturbation',sim_var2,sim_var3,c('p(O>0)','SD(O)','Hartigan D','Assortativity'))
@@ -779,16 +779,24 @@ if(scenario==41)
   dev.off()
 }
 
-layout(1:3)
-hist(opinion,20,col='grey');hist(information,20,col='grey');hist(attention,20,col='grey')
 
-layout(1)
-matplot(datad[,c('CD','freq_pos_opinion','assortativity','ambivalence_r')],
-        type='l',bty='n',xlab='x 100',ylab="value",axes=F,col=1:4,lty=1:4)
-legend('topright',col=1:7,lty=1:7,legend=c('in bifurcation set','ambivalence',
-        'freq_pos_opinion','assortativity','ambivalence_r'),bty='n')
-axis(2)
-axis(1)
+
+
+#Generrating plain results graphs
+#layout(1:3)
+#hist(opinion,20,col='grey');hist(information,20,col='grey');hist(attention,20,col='grey')
+
+#layout(1)
+#matplot(datad[,c('CD','freq_pos_opinion','assortativity','ambivalence_r')],
+#        type='l',bty='n',xlab='x 100',ylab="value",axes=F,col=1:4,lty=1:4)
+#legend('topright',col=1:7,lty=1:7,legend=c('in bifurcation set','ambivalence',
+#        'freq_pos_opinion','assortativity','ambivalence_r'),bty='n')
+#axis(2)
+#axis(1)
+
+
+
+
 
 # make gif if PGN = TRUE
 if(PNG)
