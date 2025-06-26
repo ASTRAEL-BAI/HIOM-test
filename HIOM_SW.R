@@ -184,7 +184,7 @@ for(sim_value in sim_values)
         }
         
         N=400
-        network=make_network(model='WS',N=N,clusters=10,p_within=.2,p_between=.001,rewiring=.02)
+        network=make_network(model='SBM',N=N,clusters=10,p_within=.2,p_between=.001,rewiring=.02)
         g=network[[1]];l=network[[2]];adj=network[[3]]
         
         sd_noise_information=0.0005
@@ -195,18 +195,20 @@ for(sim_value in sim_values)
         s_O=.01
         maxwell_convention=F
         
-        attention_star=4.7
+        attention_star=1
         min_attention=-.5
-        delta_attention=0.5
+        delta_attention=0.1
     
         deffuant_c=Inf
         
         # all slighty positive low attention
         split_information = sample(c(T,F),N,T,prob = c(0.5,0.5))
-        information = rnorm(N, 0, 0.1)
-        information[split_information] = rnorm(sum(split_information), -0.5, 0.1)
+        information = rnorm(N, 1, 0.1)
+        information[split_information] = rnorm(sum(split_information), -0.9, 0.1)
         attention = runif(N, 0, 0.2)
         opinion=rnorm(N,0,.2)
+        for( i in 1:500) opinion=stoch_cusp(N,opinion,attention+min_attention,
+                                            information,s_O,maxwell_convention)
         
       }
       
@@ -215,7 +217,7 @@ for(sim_value in sim_values)
         Ni= 15000 #25000 # max iterations
         if(pdfplot)  
         {
-          set.seed(12);
+          set.seed(1);
           if(plottype=='pdf'){
             pdfname='figures/figure5.pdf'
             pdf(pdfname,paper='a4r',h=8,w=12);
@@ -243,14 +245,13 @@ for(sim_value in sim_values)
         info_update=T
         sd_noise_information=0
         persuasion=2
-        r_min=0
-        
+        r_min=1
         s_O=.01
         maxwell_convention=F
         
         attention_star=1
         min_attention=-.5 # to include continuous change in O as function of K
-        delta_attention=0.4
+        delta_attention=0
         decay_attention=delta_attention/(attention_star*(N^2))
         deffuant_c=Inf
         

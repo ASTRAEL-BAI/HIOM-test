@@ -11,3 +11,6 @@ mean(attention[1:400])
 mean(attention[401:800])
 sum(attention>0.4)
 write.csv(data,"figures/attention.csv", row.names = FALSE)
+hist(opinion)
+
+sum(opinion>0)/N
