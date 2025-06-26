@@ -112,7 +112,7 @@ plot.histo= function(x,min,max,xlab='')
 
 ##############
 
-scenario=3  # set scenario
+scenario=2  # set scenario
 
 # scenario 1: removed from manuscript
 # scenario 2 : figure 4
@@ -197,15 +197,15 @@ for(sim_value in sim_values)
         
         attention_star=1
         min_attention=-.5
-        delta_attention=0.1
+        delta_attention=0.9
     
         deffuant_c=Inf
         
         # all slighty positive low attention
         split_information = sample(c(T,F),N,T,prob = c(0.5,0.5))
-        information = rnorm(N, 1, 0.1)
-        information[split_information] = rnorm(sum(split_information), -0.9, 0.1)
-        attention = runif(N, 0, 0.2)
+        information = rnorm(N, -0.8, 0.1)
+        information[split_information] = rnorm(sum(split_information), 0.8, 0.1)
+        attention = runif(N,2,2)
         opinion=rnorm(N,0,.2)
         for( i in 1:500) opinion=stoch_cusp(N,opinion,attention+min_attention,
                                             information,s_O,maxwell_convention)
