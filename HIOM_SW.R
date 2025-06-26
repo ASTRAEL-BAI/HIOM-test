@@ -45,7 +45,7 @@ make_network = function(model='SBM',N=400,clusters=10,p_within=.01,
 {
   if(model=='WS')
   {
-    g <- gg <- sample_smallworld(1, N,  1,rewiring); # The Watts-Strogatz small-world model
+    g <- gg <- sample_smallworld(1, N, 5,rewiring); # The Watts-Strogatz small-world model
     l <-layout_nicely(g)
     adj <- get.adjacency(g)
   }
@@ -112,7 +112,7 @@ plot.histo= function(x,min,max,xlab='')
 
 ##############
 
-scenario=2  # set scenario
+scenario=3  # set scenario
 
 # scenario 1: removed from manuscript
 # scenario 2 : figure 4
@@ -161,49 +161,9 @@ for(sim_value in sim_values)
       sim_i=sim_i+1
       print(sim_i)
       
-      if(scenario==1) #the cusp of cusp; removed from manuscript
-      {
-        Ni= 5000 # max iterations
-        if(pdfplot)
-        { 
-          set.seed(1);
-          pdfname=paste('figures/cuspofcusps',scenario,'.pdf',collapse='',sep='')
-          pdf(pdfname,h=8,w=11);
-          plot_iteration=c(1,(1/10)*Ni,Ni)
-          layout.m=matrix(1:3,3,1)
-        }
-        
-        n1=200;n2=200  # dimensions of lattice
-        N=n1*n2
-        lattice=T
-        g=make_lattice(c(n1, n2, 1),nei=1);l = layout_on_grid(g); # lattice
-        
-        sd_noise_information=.0
-        info_update=F # if false information is not updated
-        persuasion=1
-        r_min=0
-        
-        s_O=.00001
-        maxwell_convention=F
-        
-        attention_star=1
-        min_attention=-.5 # to include continuous change in O as function of K
-        delta_attention=0 # increase in attention when interacting
-        decay_attention=delta_attention/(attention_star*(N^2))
-        deffuant_c=Inf
-        
-        # initial values for A and I
-        k_init=.2
-        i_init_min=.5
-        i_init_max=1
-        information=rep(seq(-1*k_init,k_init,length=n1),each=n2)
-        attention=rep(seq(i_init_min,i_init_max,length=n1),n2)
-        opinion=rnorm(N,0,.3)
-      }
-      
       if(scenario==2)
       {
-        Ni=15000 # max iterations
+        Ni=15000
         if(pdfplot)
         { 
           set.seed(1);
@@ -224,7 +184,7 @@ for(sim_value in sim_values)
         }
         
         N=400
-        network=make_network(model='SBM',N=N,clusters=10,p_within=.2,p_between=.001,rewiring=.02)
+        network=make_network(model='WS',N=N,clusters=10,p_within=.2,p_between=.001,rewiring=.02)
         g=network[[1]];l=network[[2]];adj=network[[3]]
         
         sd_noise_information=0.0005
@@ -235,15 +195,15 @@ for(sim_value in sim_values)
         s_O=.01
         maxwell_convention=F
         
-        attention_star=4
+        attention_star=4.7
         min_attention=-.5
-        delta_attention=0.1
+        delta_attention=0.5
     
         deffuant_c=Inf
         
         # all slighty positive low attention
         split_information = sample(c(T,F),N,T,prob = c(0.5,0.5))
-        information = rnorm(N, 0.5, 0.1)
+        information = rnorm(N, 0, 0.1)
         information[split_information] = rnorm(sum(split_information), -0.5, 0.1)
         attention = runif(N, 0, 0.2)
         opinion=rnorm(N,0,.2)
@@ -281,16 +241,16 @@ for(sim_value in sim_values)
         g=network[[1]];l=network[[2]];adj=network[[3]]
         
         info_update=T
-        sd_noise_information=.005
+        sd_noise_information=0
         persuasion=2
-        r_min=0.1
+        r_min=0
         
         s_O=.01
         maxwell_convention=F
         
         attention_star=1
         min_attention=-.5 # to include continuous change in O as function of K
-        delta_attention=0.1
+        delta_attention=0.4
         decay_attention=delta_attention/(attention_star*(N^2))
         deffuant_c=Inf
         
@@ -389,8 +349,8 @@ for(sim_value in sim_values)
         attention_star=1
         min_attention=-0.5 # to include continuous change in O as function of K
         delta_attention=0.01
-        deffuant_c=0.2 # only interactions when |o1-o2| < .2
-        p_pertubation=0.0005 # probability of inserting meat-eating vegatarians
+        deffuant_c=0.1 # only interactions when |o1-o2| < .2
+        p_pertubation=0.002 # probability of inserting meat-eating vegatarians
         maxwell_convention=F
         
         information=sample(c(.1,-.4),N,T,prob=c(.8,.2))
@@ -690,13 +650,6 @@ for(sim_value in sim_values)
       ########end#########
       ####################
       
-      # cusp fig plot in scenario 3
-      #if(scenario==3 & pdfplot) 
-      #{cuspfig <- readPNG('figures/figure7.png')                                                          #No Need
-      #plot(c(0,1),c(0,1), type='n', main="", xlab="", ylab="",axes=F)
-      #par(mar=c(0,0,0,0))
-      #rasterImage(cuspfig, .05,-.05, .9,1.05)
-      #}
       
       if(pdfplot) dev.off()
       
@@ -793,31 +746,5 @@ if(scenario==41)
 #layout(1:3)
 #hist(opinion,20,col='grey');hist(information,20,col='grey');hist(attention,20,col='grey')
 
-#layout(1)
-#matplot(datad[,c('CD','freq_pos_opinion','assortativity','ambivalence_r')],
-#        type='l',bty='n',xlab='x 100',ylab="value",axes=F,col=1:4,lty=1:4)
-#legend('topright',col=1:7,lty=1:7,legend=c('in bifurcation set','ambivalence',
-#        'freq_pos_opinion','assortativity','ambivalence_r'),bty='n')
-#axis(2)
-#axis(1)
-
-
-
-
-
-# make gif if PGN = TRUE
-if(PNG)
-{
-  library(dplyr)
-  library(purrr) 
-  library(magick)
-  
-  list.files(path=paste0("figures/pngplots_",scenario,"/"), pattern = '*.png', full.names = TRUE) %>% 
-    image_read() %>% # reads each path file
-    image_join() %>% # joins image
-    image_animate(fps=2,loop=1) %>% # animates, can opt for number of loops
-    image_write(paste0("figures/Anim_",scenario,".gif")) # write to current dir
-  
-}
 
 
