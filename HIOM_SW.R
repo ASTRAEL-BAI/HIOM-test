@@ -112,7 +112,7 @@ plot.histo= function(x,min,max,xlab='')
 
 ##############
 
-scenario=3  # set scenario
+scenario=4  # set scenario
 
 # scenario 1: removed from manuscript
 # scenario 2 : figure 4
