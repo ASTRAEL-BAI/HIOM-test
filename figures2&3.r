@@ -7,6 +7,7 @@ stoch_cusp=function(x,b,a,sdW,dt)
   x
 }
 
+
 stoch_cusp_run=function(x0,b,a,s,n,dt)
 {
 o=rep(0,n)
@@ -20,7 +21,7 @@ o
 dpi=300
 tiff("figures/figure2.tiff",h=4,w=10,res=dpi,units='in')
 layout(matrix(1:2,1,2))
-set.seed(10)
+set.seed(11)
 dt=.15
 s=.1
 a=0;b=1

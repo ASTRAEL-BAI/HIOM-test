@@ -112,7 +112,7 @@ plot.histo= function(x,min,max,xlab='')
 
 ##############
 
-scenario=2  # set scenario
+scenario=91  # set scenario
 
 # scenario 1: removed from manuscript
 # scenario 2 : figure 4
@@ -129,10 +129,10 @@ if(PNG) unlink(paste0("figures/pngplots_",scenario,"/*"))
 
 #layout for plots
 if(scenario %in% c(1)) layout.m=layout.basis=layout(1)
-if(scenario %in% c(2,3,31)) layout.m=layout.basis=matrix(c(rep(1,8),0,2,2,3,3,4,4,0),2,8,byrow=T)
+if(scenario %in% c(91,2,3,31)) layout.m=layout.basis=matrix(c(rep(1,8),0,2,2,3,3,4,4,0),2,8,byrow=T)
 if(scenario %in% c(4,41)) layout.m=layout.basis=matrix(c(rep(1,16),2,3,4,5),4,5)
 if(scenario %in% c(1)) heights=heights.basis=1
-if(scenario %in% c(2,3,31)) heights=heights.basis=c(4,1)
+if(scenario %in% c(91,2,3,31)) heights=heights.basis=c(4,1)
 if(scenario %in% c(4,41)) heights=heights.basis=c(1,1)
 
 if(scenario>30) simulation=T else simulation=F # simulation runbs oer conbination of parameter settings
@@ -147,9 +147,15 @@ if(scenario==41) {sim_values=rep(seq(0,.002,by=.0005),each=5);sim_var=c('p(pertu
 sim_values2=rep(seq(0,.5,by=.1),each=5);sim_var2=c('t_d')
 sim_values3=c(1,2);sim_var3=c('network')}
 
+if(scenario==91) {sim_values=1;sim_var=c('p(pertubation)')
+sim_values2=1;sim_var2=c('t_d')
+sim_values3=c(0.1,0.4,0.7,0.9);sim_var3=c('network')}
+
 
 datasim=matrix(NA,length(sim_values)*length(sim_values2)*length(sim_values3),7) # data storage simulations
 sim_i=0 #counter in simulation loop
+
+attention_all <- data.frame()
 
 ## simulation loop ; not used in scenario 1,2,3,4
 for(sim_value in sim_values) 
@@ -161,7 +167,7 @@ for(sim_value in sim_values)
       sim_i=sim_i+1
       print(sim_i)
       
-      if(scenario==2)
+      if(scenario==2 || scenario==91)
       {
         Ni=15000
         if(pdfplot)
@@ -197,7 +203,9 @@ for(sim_value in sim_values)
         
         attention_star=1
         min_attention=-.5
-        delta_attention=0.9
+        if(scenario==2) {delta_attention=0.9}
+        if(scenario==91) {delta_attention=sim_value3}
+        
     
         deffuant_c=Inf
         
@@ -205,7 +213,8 @@ for(sim_value in sim_values)
         split_information = sample(c(T,F),N,T,prob = c(0.5,0.5))
         information = rnorm(N, -0.8, 0.1)
         information[split_information] = rnorm(sum(split_information), 0.8, 0.1)
-        attention = runif(N,2,2)
+        attention = rnorm(N,0,sd=.01)
+        attention[attention<0] = 0
         opinion=rnorm(N,0,.2)
         for( i in 1:500) opinion=stoch_cusp(N,opinion,attention+min_attention,
                                             information,s_O,maxwell_convention)
@@ -546,6 +555,12 @@ for(sim_value in sim_values)
                                      assortativity_g,dip,mean(opinion),sd(opinion),mean(information),
                                      sd(information),mean(attention),sd(attention))
         }
+        attention[attention<0]=0
+        if(scenario==91 && iteration == Ni) {
+                        attention_all <- rbind(attention_all,
+                         data.frame(delta_A = as.factor(delta_attention), A = attention))
+         }
+
         
         ###### Plotting
         if(plotting)
@@ -558,10 +573,10 @@ for(sim_value in sim_values)
           
           if(iteration %in% plot_iteration)
           {
-            min.o=-1.5;max.o=1.5;min.i=-1;max.i=1;min.a=0;max.a=12
+            min.o=-1.5;max.o=1.5;min.i=-1;max.i=1;min.a=0;max.a=2
             opin=sapply(-opinion, function(y) min(max(y,min.o),max.o))
             inform=sapply(-information, function(y) min(max(y,min.i),max.i))
-            atten=attention;atten[atten>12]=12
+            atten=attention;atten[atten>2]=2
             CD=27*information^2-4*(attention+min_attention)^3
             assortativity_g=assortativity(g,opinion)
             
@@ -739,6 +754,26 @@ if(scenario==41)
   
   dev.off()
 }
+
+if (scenario == 91) {
+
+  tiff("figures/attention_violin.tiff", height = 6, width = 8, units = "in", res = 300)
+  
+  print(
+    ggplot(attention_all, aes(x = delta_A, y = A, fill = delta_A)) +
+      geom_violin(trim = FALSE, cut =0, color = "black", bw = 0.001) +
+      theme_minimal(base_size = 14) +
+      labs(
+        title = "Final Attention A under different dA",
+        x = "dA",
+        y = "Attention (A)"
+      ) +
+      scale_fill_brewer(palette = "Pastel2") +
+      theme(legend.position = "none")
+  )
+  
+  dev.off()
+  }
 
 
 
