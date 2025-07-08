@@ -40,4 +40,4 @@ figureA1.r produces figure in Appendix A
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------New:
 
 scenario 6 : see how attention move in different dA
-scenario 91: see depolarization
+scenario 91 : see depolarization
