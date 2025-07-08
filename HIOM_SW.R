@@ -112,7 +112,7 @@ plot.histo= function(x,min,max,xlab='')
 
 ##############
 
-scenario=91  # set scenario
+scenario=6  # set scenario
 
 # scenario 1: removed from manuscript
 # scenario 2 : figure 4
@@ -130,10 +130,10 @@ if(PNG) unlink(paste0("figures/pngplots_",scenario,"/*"))
 #layout for plots
 if(scenario %in% c(1)) layout.m=layout.basis=layout(1)
 if(scenario %in% c(91,2,3,31)) layout.m=layout.basis=matrix(c(rep(1,8),0,2,2,3,3,4,4,0),2,8,byrow=T)
-if(scenario %in% c(4,41)) layout.m=layout.basis=matrix(c(rep(1,16),2,3,4,5),4,5)
+if(scenario %in% c(6,4,41)) layout.m=layout.basis=matrix(c(rep(1,16),2,3,4,5),4,5)
 if(scenario %in% c(1)) heights=heights.basis=1
 if(scenario %in% c(91,2,3,31)) heights=heights.basis=c(4,1)
-if(scenario %in% c(4,41)) heights=heights.basis=c(1,1)
+if(scenario %in% c(6,4,41)) heights=heights.basis=c(1,1)
 
 if(scenario>30) simulation=T else simulation=F # simulation runbs oer conbination of parameter settings
 
@@ -203,7 +203,7 @@ for(sim_value in sim_values)
         
         attention_star=1
         min_attention=-.5
-        if(scenario==2) {delta_attention=0.9}
+        if(scenario==2) {delta_attention=00}
         if(scenario==91) {delta_attention=sim_value3}
         
     
@@ -252,15 +252,15 @@ for(sim_value in sim_values)
         g=network[[1]];l=network[[2]];adj=network[[3]]
         
         info_update=T
-        sd_noise_information=0
+        sd_noise_information=.0005
         persuasion=2
-        r_min=1
+        r_min=0.7
         s_O=.01
         maxwell_convention=F
         
         attention_star=1
         min_attention=-.5 # to include continuous change in O as function of K
-        delta_attention=0
+        delta_attention=0.05
         decay_attention=delta_attention/(attention_star*(N^2))
         deffuant_c=Inf
         
@@ -325,12 +325,12 @@ for(sim_value in sim_values)
         #plot_iteration=c(1,Ni)=NA                                                                                        #Debugged
       }
       
-      if(scenario==4) # Meat eating vegies
+      if(scenario==4 || scenario==6) # Meat eating vegies
       {
         Ni= 30000 #150000 # max iterations
         if(pdfplot) 
         {
-          set.seed(3);
+          set.seed(45);
           if(plottype=='pdf'){
            pdfname='figures/figure7.pdf'
            pdf(pdfname,h=8,w=11,paper='a4r');
@@ -353,16 +353,22 @@ for(sim_value in sim_values)
         
         sd_noise_information=.0001
         persuasion=2
-        r_min=0
+        r_min=0.2
         init_opinion_random = FALSE
         s_O=.01
         attention_star=1
         min_attention=-0.5 # to include continuous change in O as function of K
-        delta_attention=0.01
-        deffuant_c=0.1 # only interactions when |o1-o2| < .2
-        p_pertubation=0.002 # probability of inserting meat-eating vegatarians
+        delta_attention=0.1
+        if(scenario==4){deffuant_c=Inf}
+        if(scenario==6){deffuant_c=Inf}
+        if(scenario==4){p_pertubation=0.}
+        if(scenario==6){p_pertubation=0}
         maxwell_convention=F
         
+        #hist(information)
+       
+
+        if(scenario==4) {
         information=sample(c(.1,-.4),N,T,prob=c(.8,.2))
         attention=rep(1,N)
         attention[information>0]=0.1
@@ -373,8 +379,21 @@ for(sim_value in sim_values)
         opinion[(.5*N+1):N]=opinion[1:(.5*N)]
         for( i in 1:500) opinion=stoch_cusp(N,opinion,attention+min_attention,
                                             information,s_O,maxwell_convention)
+        }
+        if(scenario == 6) {
+          split = sample(c(T,F),N,replace = T,prob = c(0.5,0.5))
+          information = rnorm(N, 0.5, 0.01)
+          information[split] = rnorm(sum(split),-0.2,0.01)
+          attention = runif(N,0,0.1)
+          opinion = rnorm(N,0,0.1)
+          information[(.5*N+1):N]=information[1:(.5*N)]
+          attention[(.5*N+1):N]=attention[1:(.5*N)]
+          opinion[(.5*N+1):N]=opinion[1:(.5*N)]
+          for( i in 1:500) opinion=stoch_cusp(N,opinion,attention+min_attention,
+                                            information,s_O,maxwell_convention)
+        }
       }
-      
+
       if(scenario==41) # Meat eating veggies
       {
         N=400
@@ -555,7 +574,7 @@ for(sim_value in sim_values)
                                      assortativity_g,dip,mean(opinion),sd(opinion),mean(information),
                                      sd(information),mean(attention),sd(attention))
         }
-        attention[attention<0]=0
+        
         if(scenario==91 && iteration == Ni) {
                         attention_all <- rbind(attention_all,
                          data.frame(delta_A = as.factor(delta_attention), A = attention))
@@ -618,21 +637,21 @@ for(sim_value in sim_values)
             }
             if(scenario==2) text(.9,32,sub,cex=1.2,pos=4,xpd=NA)
             
-            if(scenario==4){
+            if(scenario==4 || scenario ==6){
               
               h_d=hartigan_d(opinion[(1+(N/2)):N])
-              title=paste('p(O>0) =',round(sum(opinion[(1+(N/2)):N]>0)/(.5*N),2),
-                          '\nsd(O) =',round(sd(opinion[(1+(N/2)):N]),2))
+              title=paste('p(O>0) =',round(sum(opinion[(1+(N/2)):N]>0)/(.5*N),2)
+                          )
               sub_H=paste('\nHartigan D = ',round(h_d[[1]],2),h_d[[2]],sep="",col="")
               sub_A=paste("\nAssortativity =",round(assortativity( gg,opinion[(1+(N/2)):N]),2))
-              sub1=paste(title,sub_H,sub_A)
+              sub1=paste(title,sub_H)
               
               h_d=hartigan_d(opinion[1:(N/2)])
-              sub=paste('p(O>0) =',round(sum(opinion[1:(N/2)]>0)/(.5*N),2),
-                        '\nsd(O) =',round(sd(opinion[1:(N/2)]),2))
+              sub=paste('p(O>0) =',round(sum(opinion[1:(N/2)]>0)/(.5*N),2)
+                         )
               sub_H=paste('\nHartigan D = ',round(h_d[[1]],2),h_d[[2]],sep="",col="")
               sub_A=paste("\nAssortativity =",round(assortativity(gg,opinion[1:(N/2)]),2))
-              sub=paste(sub,sub_H,sub_A)
+              sub=paste(sub,sub_H)
               
               plot.graph(adj,l,opin,inform,atten,CD,title="",shape,c.title)
               par(mar=c(0,0,0,0))
@@ -784,3 +803,9 @@ if (scenario == 91) {
 
 
 
+mean(attention[1:400])
+mean(attention[401:800])
+mean(information[1:400])
+mean(information[401:800])
+
+hist(information[401:800])
