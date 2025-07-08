@@ -1,6 +1,8 @@
 This project is based on the original code from [hvdmaas/HIOM](https://github.com/hvdmaas/HIOM).  
 The original author is hvdmaas. The code is licensed under the [GNU General Public License v3.0 (GPL-3.0)](https://www.gnu.org/licenses/gpl-3.0.html).
 
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
 # HIOM
 R code for "The polarization within and across individuals: the hierarchical Ising opinion model"
 submitted to Journal of Complex Networks
@@ -35,3 +37,7 @@ figures2&3.r produces figure 2 and 3
 
 figureA1.r produces figure in Appendix A
 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------New:
+
+scenario 6 : see how attention move in different dA
+scenario 91: see depolarization
