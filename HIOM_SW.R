@@ -112,7 +112,7 @@ plot.histo= function(x,min,max,xlab='')
 
 ##############
 
-scenario=6  # set scenario
+scenario=3  # set scenario
 
 # scenario 1: removed from manuscript
 # scenario 2 : figure 4
@@ -120,6 +120,8 @@ scenario=6  # set scenario
 # scenario 31 : figure 6 (warning: takes hours)
 # scenario 4 : figure 7
 # scenario 41 : figure 8 (warning: takes hours)
+# scenario 6 :depolarization
+#scenario 91: visualize move of attention
 
 pdfplot=T # if TRUE to plot to pdf files used for manuscript figures
 plottype='tiff'
@@ -149,7 +151,7 @@ sim_values3=c(1,2);sim_var3=c('network')}
 
 if(scenario==91) {sim_values=1;sim_var=c('p(pertubation)')
 sim_values2=1;sim_var2=c('t_d')
-sim_values3=c(0.1,0.4,0.7,0.9);sim_var3=c('network')}
+sim_values3=c(0.1,0.4,0.7,0.9, 1.3);sim_var3=c('network')}
 
 
 datasim=matrix(NA,length(sim_values)*length(sim_values2)*length(sim_values3),7) # data storage simulations
@@ -245,8 +247,8 @@ for(sim_value in sim_values)
         }
         
         N=400
-        social_network='SBM'
-       # social_network='lattice'
+        #social_network='SBM'
+        social_network='lattice'
         
         network=make_network(social_network,N=N,clusters=10,p_within=.2,p_between=.001,rewiring=.02)
         g=network[[1]];l=network[[2]];adj=network[[3]]
@@ -273,7 +275,8 @@ for(sim_value in sim_values)
         
         # except for some negative high attention persons (activists)
         m=rep(0,N)
-        m[seq(1,N,N/3)[-1]-1]=1
+        #m[seq(1,N,N/3)[-1]-1]=1
+        m[190]=1
         information_activists=-.5
         attention_activists=1
         opinion_activists=-.5
