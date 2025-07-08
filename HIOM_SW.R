@@ -203,7 +203,7 @@ for(sim_value in sim_values)
         
         attention_star=1
         min_attention=-.5
-        if(scenario==2) {delta_attention=00}
+        if(scenario==2) {delta_attention=0.2}
         if(scenario==91) {delta_attention=sim_value3}
         
     
@@ -211,9 +211,9 @@ for(sim_value in sim_values)
         
         # all slighty positive low attention
         split_information = sample(c(T,F),N,T,prob = c(0.5,0.5))
-        information = rnorm(N, -0.8, 0.1)
-        information[split_information] = rnorm(sum(split_information), 0.8, 0.1)
-        attention = rnorm(N,0,sd=.01)
+        information = rnorm(N, 0.7, 0.1)
+        information[split_information] = rnorm(sum(split_information), -0.4, 0.1)
+        attention = runif(N,0,0.1)
         attention[attention<0] = 0
         opinion=rnorm(N,0,.2)
         for( i in 1:500) opinion=stoch_cusp(N,opinion,attention+min_attention,
@@ -353,17 +353,21 @@ for(sim_value in sim_values)
         
         sd_noise_information=.0001
         persuasion=2
-        r_min=0.2
+        r_min=0.1
         init_opinion_random = FALSE
         s_O=.01
         attention_star=1
         min_attention=-0.5 # to include continuous change in O as function of K
-        delta_attention=0.1
+        if(scenario==4) {delta_attention=0.1}
         if(scenario==4){deffuant_c=Inf}
         if(scenario==6){deffuant_c=Inf}
         if(scenario==4){p_pertubation=0.}
         if(scenario==6){p_pertubation=0}
-        maxwell_convention=F
+        if(scenario==6) {
+          delta_attentionA=0.1
+          delta_attentionB=0.9
+        }
+         maxwell_convention=F
         
         #hist(information)
        
@@ -383,7 +387,7 @@ for(sim_value in sim_values)
         if(scenario == 6) {
           split = sample(c(T,F),N,replace = T,prob = c(0.5,0.5))
           information = rnorm(N, 0.5, 0.01)
-          information[split] = rnorm(sum(split),-0.2,0.01)
+          information[split] = rnorm(sum(split),-0.5,0.01)
           attention = runif(N,0,0.1)
           opinion = rnorm(N,0,0.1)
           information[(.5*N+1):N]=information[1:(.5*N)]
@@ -501,9 +505,23 @@ for(sim_value in sim_values)
             
             ### attention update for interacting agents
             if( abs(O1-O2) < deffuant_c )
-            {
+            { 
+              if(scenario!=6){
               attention[agent]=attention[agent]+delta_attention*(2*attention_star-attention[agent]) 
               attention[partner]=attention[partner]+delta_attention*(2*attention_star-attention[partner])
+          
+             }
+             if(scenario==6) {
+              if(agent <= 400) {
+                delta_attention = delta_attentionB
+              }
+              if(agent>400){
+                delta_attention = delta_attentionA
+              }
+              attention[agent]=attention[agent]+delta_attention*(2*attention_star-attention[agent]) 
+              attention[partner]=attention[partner]+delta_attention*(2*attention_star-attention[partner])
+             }
+
             }
           }
           
@@ -803,9 +821,3 @@ if (scenario == 91) {
 
 
 
-mean(attention[1:400])
-mean(attention[401:800])
-mean(information[1:400])
-mean(information[401:800])
-
-hist(information[401:800])
